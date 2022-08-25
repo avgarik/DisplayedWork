@@ -1,0 +1,137 @@
+```{r}
+#Load packages
+library(httr)
+library(jsonlite)
+library(stringr)
+library(plot3D)
+library(ggplot2)
+library(GGally)
+```
+
+```{r}
+#Function to get electricity data from EIA API
+
+EIA_electricity_API<- function(data_category="", data_column1="", data_column2="", data_column3="", data_column4="", sectorID="", stateID="", frequency="", start_date="", end_date="", sort_column="", sort_direction=""){
+  base<- "https://api.eia.gov/v2/electricity/"
+  key<- "jHbzc1RDEdY7z6xZpZnoFQei3bRTHVkDTqESk1J4"
+  data_category<- data_category
+  data_column1<- data_column1
+  data_column2<- data_column2
+  data_column3<- data_column3
+  data_column4<- data_column4
+  sectorID<- sectorID
+  stateID<- stateID
+  frequency<- frequency
+  start_date<- start_date
+  end_date<- end_date
+  sort_column<- sort_column
+  sort_direction<- sort_direction
+  
+  raw_data<- GET(paste0(base, 
+                        
+    #data category: retail-sales, electric-power-operational-data, rto, state-electricity-profiles, operating-generator-capacity, facility-fuel
+    ifelse(data_category!= "", paste0(data_category, "/data")),
+                        
+    "?api_key=", key,
+                        
+    #data column to be returned: revenue, sales, price, customers
+    ifelse(data_column1!= "", paste0("&data[]=", data_column1), ""),
+                
+    #data column to be returned: revenue, sales, price, customers
+    ifelse(data_column2!= "", paste0("&data[]=", data_column2), ""),
+                
+    #data column to be returned: revenue, sales, price, customers
+    ifelse(data_column3!= "", paste0("&data[]=", data_column3), ""),
+                
+    #data column to be returned: revenue, sales, price, customers
+    ifelse(data_column4!= "", paste0("&data[]=", data_column4), ""),
+                        
+    #sectorID: COM, RES, ALL, OTH, TRA
+    ifelse(sectorID!= "", paste0("&facets[sectorid][]=", sectorID), ""),
+                        
+    #stateID
+    ifelse(stateID!= "", paste0("&facets[stateid][]=", stateID), ""),
+                
+    #frequency: monthly, quarterly, annual, daily
+    ifelse(frequency!= "", paste0("&frequency=", frequency), ""),
+                
+    #start date: YYYY-MM-DD
+    ifelse(start_date!= "", paste0("&start=", start_date), ""),
+                
+    #end date: YYYY-MM-DD
+    ifelse(end_date!= "", paste0("&end=", end_date), ""),
+                
+    #column to sort by
+    ifelse(sort_column!= "", paste0("&sort[0][column]=", sort_column), ""),
+                
+    #sort direction: asc or desc ***not optional if sorting by a column
+    ifelse(sort_direction!= "", paste0("&sort[0][direction]=", sort_direction), "")
+    ))
+  
+  #Convert json to DF
+  convert_json<- fromJSON(rawToChar(raw_data$content), flatten= TRUE)[1]
+  #Select converted json file with data
+  return(convert_json$response$data)
+}
+```
+
+```{r}
+#Dataframe of average electricity retail price, revenue from electricity retail sales, number of electricity sales, and number of customers for residential electricity for all 50 states in 2019
+res_df<- EIA_electricity_API(data_category = "retail-sales", data_column1 = "price", data_column2 = "revenue", data_column3 = "sales", data_column4 = "customers", sectorID = "RES", frequency = "annual", start_date = "2019", end_date = "2019")
+
+#Clean colnames to use subset function
+colnames(res_df)<- str_replace(colnames(res_df), "-", "_")
+
+#Dataframe of average electricity retail price, revenue from electricity retail sales, and number of customers for residential electricity for all 50 states in 2019
+res_df<- subset(res_df, stateid %in% state.abb==TRUE, select=c(price, revenue, customers))
+```
+
+
+```{r}
+#Visualize relationships in data: scatterplots, correlation coefficients, distribution of data
+ggpairs(res_df)
+
+#Visualize data in 3d
+x<- res_df$revenue
+y<- res_df$customers
+z<- res_df$price
+
+scatter3D(x,y,z, pch=19, cex=1.5, colvar = z, bty="b2", ticktype="simple", main="Average electricity price, revenue, and \nnumber of customers in 2019", phi=0, clab="Price (cents/kWh)", col=ramp.col(c("green", "yellow", "red")), xlab="Revenue (mil kWh)", ylab="Number of customers", zlab="Price (cents/kWh)")
+
+#Determine based on data visualization that these variables are not good candidates for multiple linear regression
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
