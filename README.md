@@ -1,2 +1,2 @@
 # DisplayedWork
-Public repo for work that I want to show off.
+Projects that I've worked on in R and Python.
