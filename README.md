@@ -9,3 +9,6 @@ Climate-related news headlines taken from "climate-news-db" by Adam Green. Other
 
 **EIA Electricity Exploration**  
 Extract and visualize electricity data through EIA's API.
+
+**Carbon Footprint Calculator**  
+Calculate carbon footprint based on user input.
