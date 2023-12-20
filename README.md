@@ -1,5 +1,5 @@
 # DisplayedWork
-Projects that I've worked on in R and Python.
+Projects that I've worked on in Python, PySpark, and R.
 
 **Patent Clustering**  
 Clustering the titles and abstracts from 16,000 patents including the word "mycelium", data downloaded from Clarivate.
