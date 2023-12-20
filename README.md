@@ -6,3 +6,6 @@ Clustering the titles and abstracts from 16,000 patents including the word "myce
 
 **News Classifer**  
 Climate-related news headlines taken from "climate-news-db" by Adam Green. Other news headlines from Huffpost and taken from Codify's "News Category Dataset".
+
+**EIA Electricity Exploration**  
+Extract and visualize electricity data through EIA's API.
